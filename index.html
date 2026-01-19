@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>名古屋之旅 V10.2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Roboto:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            /* V9.1 霧藍色配色 (Foggy Blue) */
+            --bg-color: #F0F4F8;
+            --card-bg: #FFFFFF;
+            --text-main: #37474F;
+            --text-sub: #607D8B;
+            --primary: #546E7A;
+            --primary-dark: #263238;
+            --header-gradient: linear-gradient(135deg, #78909C 0%, #455A64 100%);
+            --accent: #FF7043;
+            
+            --tag-food-bg: #FFF3E0; --tag-food-text: #E65100;
+            --tag-shop-bg: #F3E5F5; --tag-shop-text: #6A1B9A;
+            --tag-trans-bg: #E1F5FE; --tag-trans-text: #0277BD;
+            --tag-spot-bg: #E8F5E9; --tag-spot-text: #2E7D32;
+            --tag-price-bg: #F5F5F5; --tag-price-text: #546E7A;
+            --tag-warn-bg: #FFEBEE; --tag-warn-text: #C62828;
+
+            --radius: 14px;
+            --shadow: 0 4px 12px rgba(84, 110, 122, 0.12);
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            height: 100vh;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            font-size: 18px;
+            background-image: linear-gradient(to bottom, #F0F4F8 0%, #FFFFFF 100%);
+        }
+
+        header { 
+            padding: 20px 20px 15px; 
+            background: var(--header-gradient); 
+            z-index: 10; color: #FFFFFF;
+            box-shadow: 0 4px 8px rgba(55, 71, 79, 0.2);
+            border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
+        }
+        .app-title { font-size: 26px; font-weight: 900; color: #FFFFFF; display: flex; align-items: center; gap: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .app-subtitle { font-size: 16px; color: rgba(255,255,255,0.85); margin-left: 42px; margin-top: 5px; font-weight: 700; letter-spacing: 0.5px; }
+
+        main { flex: 1; overflow-y: auto; padding-bottom: calc(100px + var(--safe-bottom)); scroll-behavior: smooth; }
+        .view-section { display: none; padding: 0 16px; animation: fadeIn 0.4s ease; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
+
+        .date-scroller-wrapper { position: sticky; top: 0; z-index: 20; background: transparent; padding: 15px 0 10px; margin: 0 5px; }
+        .date-scroller { display: flex; overflow-x: auto; gap: 12px; scrollbar-width: none; padding: 0 10px; }
+        .date-chip { 
+            flex: 0 0 auto; min-width: 75px; text-align: center; padding: 12px 0; 
+            background: rgba(255,255,255,0.95); border-radius: 12px; 
+            color: var(--text-sub); transition: all 0.3s ease; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06); border: 1px solid #CFD8DC; 
+        }
+        .date-chip.active { 
+            background: var(--primary); color: white; 
+            transform: translateY(-4px); 
+            box-shadow: 0 6px 12px rgba(84, 110, 122, 0.4); 
+            border-color: transparent; 
+        }
+        .date-chip.backup { border: 2px solid var(--accent); color: var(--accent); background: #FFF; }
+        .date-chip.backup.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .date-chip .day { font-size: 15px; margin-bottom: 4px; font-weight: 700; }
+        .date-chip .date { font-size: 20px; font-weight: 900; font-family: 'Roboto'; }
+
+        .timeline-container { position: relative; padding-left: 10px; margin-top: 15px; }
+        .timeline-card { 
+            background: var(--card-bg); border-radius: var(--radius); padding: 22px; 
+            margin-bottom: 20px; box-shadow: var(--shadow); 
+            position: relative; z-index: 1; border-left: 5px solid var(--primary); 
+            overflow: hidden;
+        }
+        .timeline-line { 
+            position: absolute; 
+            left: 34px; 
+            top: 45px;    
+            bottom: 20px; 
+            width: 2px; 
+            background: #CFD8DC; 
+            z-index: 0; 
+        }
+        .timeline-card:last-child .timeline-line { display: none; }
+        .card-header { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 12px; }
+        .time { font-family: 'Roboto'; font-weight: 900; color: var(--primary); font-size: 22px; min-width: 65px; margin-top: 2px; }
+        .title { font-size: 22px; font-weight: 900; color: var(--text-main); line-height: 1.4; flex: 1; }
+        .card-body { margin-left: 80px; font-size: 18px; color: var(--text-main); line-height: 1.6; }
+
+        .trans-box {
+            background: #ECEFF1;
+            border-left: 4px solid #78909C;
+            padding: 14px; margin: 10px 0 15px;
+            border-radius: 6px;
+            font-size: 17px; color: #37474F;
+        }
+        .trans-title { font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: #455A64; }
+        .trans-time { background: #CFD8DC; color: #37474F; font-size: 14px; padding: 2px 8px; border-radius: 10px; margin-left: auto; }
+        .trans-route { font-size: 17px; line-height: 1.6; color: #37474F; font-weight: 500; }
+        .trans-fare { font-weight: 700; color: #D84315; margin-left: 8px; font-family: 'Roboto'; font-size: 15px; background: #FFCCBC; padding: 2px 6px; border-radius: 4px;}
+        .trans-arrow { color: #90A4AE; margin: 0 5px; font-size: 14px; }
+        .jp-station { color: #78909C; font-size: 15px; font-weight: 400; margin-left: 4px; }
+
+        .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .tag { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 8px; font-size: 15px; font-weight: 700; }
+        .tag-food { background: var(--tag-food-bg); color: var(--tag-food-text); }
+        .tag-shop { background: var(--tag-shop-bg); color: var(--tag-shop-text); }
+        .tag-trans { background: var(--tag-trans-bg); color: var(--tag-trans-text); }
+        .tag-spot { background: var(--tag-spot-bg); color: var(--tag-spot-text); }
+        .tag-price { background: var(--tag-price-bg); color: var(--tag-price-text); border: 1px solid #CFD8DC; }
+        .tag-warn { background: var(--tag-warn-bg); color: var(--tag-warn-text); font-weight: 900; border: 2px solid #FFCDD2; }
+
+        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
+        .nav-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: white; color: var(--primary); padding: 14px 20px; border-radius: 50px; text-decoration: none; font-size: 18px; font-weight: 700; border: 2px solid #B0BEC5; width: 100%; transition: all 0.2s; }
+        .nav-btn:active { background: #ECEFF1; transform: scale(0.98); }
+        .map-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: #FFECB3; color: #E65100; padding: 14px 20px; border-radius: 50px; text-decoration: none; font-size: 18px; font-weight: 700; width: 100%; border: 1px solid #FFE082; }
+
+        .flight-card, .hotel-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); margin-bottom: 30px; border: 1px solid #CFD8DC; }
+        .flight-header { background: #546E7A; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: 700; }
+        .flight-body { padding: 25px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .airport-code { font-size: 32px; font-weight: 900; color: #37474F; }
+        .airport-name { font-size: 16px; color: #90A4AE; margin-top: 5px; font-weight: 500; }
+        .flight-times { margin-top: 0; display: flex; justify-content: space-between; font-size: 22px; font-weight: 700; color: #37474F; padding: 0 20px 25px; }
+        .hotel-card { padding: 25px; border-left: 8px solid var(--accent); }
+        .hotel-name { font-size: 22px; font-weight: 900; color: #37474F; margin-bottom: 10px; }
+        .hotel-date { font-size: 18px; color: var(--accent); font-weight: 700; margin-bottom: 15px; display: block; }
+        .hotel-addr { font-size: 16px; color: #607D8B; line-height: 1.5; margin-bottom: 20px; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #FFFFFF; border-top: 1px solid #CFD8DC; display: flex; justify-content: space-around; padding: 15px 0 calc(15px + var(--safe-bottom)); z-index: 100; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #B0BEC5; font-size: 14px; cursor: pointer; width: 80px; gap: 6px; }
+        .nav-item i { font-size: 28px; margin-bottom: 2px; }
+        .nav-item.active { color: var(--primary); font-weight: 900; }
+        
+        #weather-banner { background: white; padding: 18px; border-radius: 12px; margin-bottom: 15px; box-shadow: var(--shadow); border: 1px solid #CFD8DC; display:flex; align-items:center; gap:15px; font-weight:700; color: var(--text-main); }
+        .backup-banner { background: #FFF3E0; color: #E65100; padding: 18px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; border: 1px solid #FFE0B2; }
+
+        /* 記帳樣式 */
+        .accounting-form { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow); margin-bottom: 20px; border: 1px solid #CFD8DC; }
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 14px; color: var(--text-sub); margin-bottom: 5px; font-weight: 700; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #CFD8DC; border-radius: 8px; font-size: 16px; outline: none; transition: border 0.2s; background: #FAFAFA; }
+        .form-input:focus { border-color: var(--primary); background: #FFF; }
+        .submit-btn { width: 100%; padding: 14px; background: var(--header-gradient); color: white; border: none; border-radius: 50px; font-size: 18px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 10px rgba(84, 110, 122, 0.3); }
+        .submit-btn:active { transform: scale(0.98); }
+
+        .expense-list { list-style: none; padding: 0; margin: 0; }
+        .expense-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #EEE; }
+        .expense-info { display: flex; flex-direction: column; gap: 4px; }
+        .expense-name { font-weight: 700; color: var(--text-main); font-size: 16px; }
+        .expense-meta { font-size: 12px; color: var(--text-sub); }
+        .expense-amount { font-family: 'Roboto'; font-weight: 900; color: var(--accent); font-size: 18px; }
+        .total-banner { background: var(--primary); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: 900; font-size: 20px; box-shadow: var(--shadow); }
+        .delete-btn { color: #CFD8DC; margin-left: 15px; padding: 5px; cursor: pointer; font-size: 18px;}
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="app-title"><i class="fa-solid fa-cloud"></i> 名古屋之旅</div>
+        <div class="app-subtitle">2026/2/4 - 2/11 (8天7夜)</div>
+    </header>
+
+    <main>
+        <section id="tab-itinerary" class="view-section active">
+            <div class="date-scroller-wrapper"><div class="date-scroller" id="date-scroll"></div></div>
+            <div id="weather-banner"><span style="color:#999">正在更新氣象...</span></div>
+            <div class="timeline-container" id="itinerary-list"></div>
+            <div style="height: 20px;"></div>
+        </section>
+
+        <section id="tab-info" class="view-section">
+            <h3 style="font-size:20px; color:var(--text-main); margin:20px 0 15px; padding-left:12px; font-weight:900; border-left:6px solid #FF7043;">台灣虎航 (高雄 KHH)</h3>
+            <div class="flight-card">
+                <div class="flight-header"><span><i class="fa-solid fa-plane-departure"></i> 去程 2/4 (週三)</span><span>IT 268</span></div>
+                <div class="flight-body">
+                    <div style="text-align:center;"><div class="airport-code">KHH</div><div class="airport-name">高雄小港</div></div>
+                    <div style="color:#B0BEC5; font-size:30px;">➔</div>
+                    <div style="text-align:center;"><div class="airport-code">NGO</div><div class="airport-name">名古屋 T2</div></div>
+                </div>
+                <div class="flight-times"><span>14:50</span><span>18:50</span></div>
+            </div>
+            <div class="flight-card">
+                <div class="flight-header" style="background:#455A64;"><span><i class="fa-solid fa-plane-arrival"></i> 回程 2/11 (週三)</span><span>IT 269</span></div>
+                <div class="flight-body">
+                    <div style="text-align:center;"><div class="airport-code">NGO</div><div class="airport-name">名古屋 T2</div></div>
+                    <div style="color:#B0BEC5; font-size:30px;">➔</div>
+                    <div style="text-align:center;"><div class="airport-code">KHH</div><div class="airport-name">高雄小港</div></div>
+                </div>
+                <div class="flight-times"><span>19:40</span><span>22:35</span></div>
+            </div>
+            <h3 style="font-size:20px; color:var(--text-main); margin:30px 0 15px; padding-left:12px; font-weight:900; border-left:6px solid var(--accent);">入住飯店資訊</h3>
+            <div class="hotel-card">
+                <div class="hotel-name">Minn STATION Ai Nagoya</div>
+                <span class="hotel-date">2/4 (三) - 2/8 (日) · 4晚</span>
+                <div class="hotel-addr">名古屋市昭和區鶴舞 1-2-32 (STATION Ai 7F)</div>
+                <a href="https://maps.app.goo.gl/DR5US1Swcfc2goix7" target="_blank" class="nav-btn"><i class="fa-solid fa-location-dot"></i> 導航至飯店</a>
+            </div>
+            <div class="hotel-card" style="border-left-color: var(--primary);">
+                <div class="hotel-name">ACCESS by LOISIR HOTEL</div>
+                <span class="hotel-date" style="color:var(--primary)">2/8 (日) - 2/11 (三) · 3晚</span>
+                <div class="hotel-addr">名古屋市中區榮 4-10-5</div>
+                <a href="https://maps.app.goo.gl/WxHYX2tt1ChcnupAA" target="_blank" class="nav-btn"><i class="fa-solid fa-location-dot"></i> 導航至飯店</a>
+            </div>
+        </section>
+
+        <section id="tab-accounting" class="view-section">
+            <div class="total-banner">
+                總支出：¥<span id="total-amount">0</span>
+            </div>
+        
+            <div class="accounting-form">
+                <div class="form-group">
+                    <label class="form-label">項目名稱</label>
+                    <input type="text" id="item-name" class="form-input" placeholder="例如：午餐、紀念品...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">金額 (日幣)</label>
+                    <input type="number" id="item-price" class="form-input" placeholder="輸入金額">
+                </div>
+                <button class="submit-btn" onclick="addExpense()">記一筆</button>
+            </div>
+        
+            <h3 style="font-size:18px; color:var(--text-sub); margin-bottom:10px; padding-left:5px;">最近紀錄</h3>
+            <ul class="expense-list" id="expense-list">
+                <div style="text-align:center; color:#999; padding:20px;">載入中...</div>
+            </ul>
+        </section>
+    </main>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('itinerary', this)">
+            <i class="fa-solid fa-list-check"></i> 每日行程
+        </div>
+        <div class="nav-item" onclick="switchTab('info', this)">
+            <i class="fa-solid fa-ticket"></i> 機票住宿
+        </div>
+        <div class="nav-item" onclick="switchTab('accounting', this)">
+            <i class="fa-solid fa-calculator"></i> 記帳
+        </div>
+        <div class="nav-item" onclick="window.open('https://maps.app.goo.gl/S1AmEUN4PpyF35dK9', '_blank')">
+            <i class="fa-solid fa-map-location-dot"></i> 地圖
+        </div>
+    </nav>
+
+<script type="module">
+    // --- Firebase Initialization ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // 您的專屬 Firebase 設定
+    const firebaseConfig = {
+      apiKey: "AIzaSyARfMT-jUN0x8r-ooJu90YGcAlAEbpWNBA",
+      authDomain: "nagoya-trip-93469.firebaseapp.com",
+      databaseURL: "https://nagoya-trip-93469-default-rtdb.firebaseio.com",
+      projectId: "nagoya-trip-93469",
+      storageBucket: "nagoya-trip-93469.firebasestorage.app",
+      messagingSenderId: "774831611975",
+      appId: "1:774831611975:web:0efdc0fa00ab4118e91162",
+      measurementId: "G-J21VZH41JG"
+    };
+
+    // Initialize
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const expensesRef = ref(db, 'expenses');
+
+    // --- Accounting Logic (No Payer) ---
+    window.addExpense = function() {
+        const name = document.getElementById('item-name').value;
+        const price = document.getElementById('item-price').value;
+
+        if (!name || !price) {
+            alert("請輸入項目和金額喔！");
+            return;
+        }
+
+        push(expensesRef, {
+            name: name,
+            price: parseInt(price),
+            date: new Date().toISOString()
+        }).then(() => {
+            document.getElementById('item-name').value = '';
+            document.getElementById('item-price').value = '';
+            alert("記帳成功！");
+        }).catch((error) => {
+            alert("上傳失敗: " + error.message);
+        });
+    }
+
+    window.deleteExpense = function(key) {
+        if(confirm("確定要刪除這筆紀錄嗎？")) {
+            const itemRef = ref(db, 'expenses/' + key);
+            remove(itemRef);
+        }
+    }
+
+    onValue(expensesRef, (snapshot) => {
+        const list = document.getElementById('expense-list');
+        const totalEl = document.getElementById('total-amount');
+        list.innerHTML = '';
+        let total = 0;
+
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            const entries = Object.entries(data).reverse();
+
+            entries.forEach(([key, value]) => {
+                total += value.price;
+                const li = document.createElement('li');
+                li.className = 'expense-item';
+                const d = new Date(value.date);
+                const timeStr = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                
+                li.innerHTML = `
+                    <div class="expense-info">
+                        <span class="expense-name">${value.name}</span>
+                        <span class="expense-meta">${timeStr}</span>
+                    </div>
+                    <div style="display:flex; align-items:center;">
+                        <span class="expense-amount">¥${value.price.toLocaleString()}</span>
+                        <i class="fa-solid fa-trash delete-btn" onclick="deleteExpense('${key}')"></i>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        } else {
+            list.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">目前還沒有花費紀錄</div>';
+        }
+        totalEl.innerText = total.toLocaleString();
+    });
+
+    // --- V9.1 Data (Short lines, Foggy Blue, Detailed Trans) ---
+    const tripData = {
+        "2026-02-04": [
+            { 
+                time: "18:50", title: "抵達中部國際機場", sub: "入境 (T2航廈) -> 步行至 T1", type: "move", 
+                map_link: "https://maps.app.goo.gl/wd1DWZFhuDGnfVhE6",
+                trans: { mode: "名鐵特急", time: "約 35 分", route: "中部國際機場 (中部国際空港) <i class='fa-solid fa-arrow-right trans-arrow'></i> 金山站 (金山) <i class='fa-solid fa-arrow-right trans-arrow'></i> 鶴舞站 (鶴舞)", fare: "約 ¥1,100" }
+            },
+            { 
+                time: "19:40", title: "前往飯店: Minn STATION Ai", sub: "車程約 60 分 | 辦理入住", type: "move", 
+                map_link: "https://maps.app.goo.gl/DR5US1Swcfc2goix7",
+                trans: { mode: "JR 中央線", time: "約 3 分", route: "金山站 (金山) <i class='fa-solid fa-arrow-right trans-arrow'></i> 鶴舞站 (鶴舞)", fare: "¥150" }
+            },
+            { time: "21:00", title: "附近晚餐", sub: "便利商店或周邊餐廳", type: "food", map_link: "https://maps.app.goo.gl/DR5US1Swcfc2goix7" }
+        ],
+        "2026-02-05": [
+            { 
+                time: "10:30", title: "出發 (德川園)", sub: "睡飽出門 | 車程約 30 分", type: "move", 
+                map_link: "https://maps.app.goo.gl/2hmRJcyDmzC3AqzQ7https://maps.app.goo.gl/wurExDasHoXdrqjT8",
+                trans: { mode: "JR 中央線", time: "約 4 分", route: "鶴舞站 (鶴舞) <i class='fa-solid fa-arrow-right trans-arrow'></i> 大曾根站 (大曽根) (南口出步行10分)", fare: "¥200" }
+            },
+            { time: "11:00", title: "德川園 (Tokugawaen)", sub: "日式庭園 | 門票 ¥300", type: "spot", map_link: "https://maps.app.goo.gl/2hmRJcyDmzC3AqzQ7https://maps.app.goo.gl/wurExDasHoXdrqjT8" },
+            { time: "12:00", title: "午餐", sub: "園區或附近用餐", type: "food", map_link: "" },
+            { 
+                time: "13:30", title: "名古屋城 (本丸御殿)", sub: "參觀宮殿 | ⚠️天守閣整修中", type: "spot", price: "¥500", 
+                map_link: "https://maps.app.goo.gl/NfMn2GaQRvfzhqNo9",
+                trans: { 
+                    mode: "市公車 基幹2", time: "約 12 分",
+                    route: "Tokugawaen Shindeki (徳川園新出来) <i class='fa-solid fa-arrow-right trans-arrow'></i> Shiyakusho (市役所)", 
+                    fare: "¥210" 
+                }
+            },
+            { 
+                time: "17:00", title: "榮商圈 (Sakae)", sub: "地下街逛街、UNIQLO | 晚餐", type: "shop", 
+                map_link: "https://maps.app.goo.gl/xSSezAJDkzpvzVDP9",
+                trans: { mode: "地鐵名城線", time: "約 3 分", route: "名古屋城站 (名古屋城) <i class='fa-solid fa-arrow-right trans-arrow'></i> 榮站 (栄)", fare: "¥210" }
+            }
+        ],
+        "2026-02-06": [
+            { 
+                time: "08:15", title: "集合 (Ministop)", sub: "地點：Bic Camera 後面的 Ministop", type: "move", 
+                nav_override: "Ministop Meieki Taiko", map_link: "https://maps.app.goo.gl/wd1DWZFhuDGnfVhE64?entry=ttu",
+                trans: { mode: "JR 中央線", time: "約 7 分", route: "鶴舞站 (鶴舞) <i class='fa-solid fa-arrow-right trans-arrow'></i> 名古屋站 (名古屋) (太閣通口)", fare: "¥200" }
+            }, 
+            { time: "08:30", title: "準時發車", sub: "KKday 一日遊 | 巴士移動", type: "move", map_link: "" },
+            { time: "11:00", title: "飛驒高山古街", sub: "停留 120 分 | 自由午餐", type: "spot", map_link: "https://maps.app.goo.gl/wd1DWZFhuDGnfVhE65" },
+            { time: "13:00", title: "前往展望台", sub: "集合出發", type: "move", map_link: "" },
+            { time: "14:30", title: "白川鄉合掌村", sub: "停留 90 分 | 散步拍照", type: "spot", map_link: "https://www.google.com/maps/dir/?api=1&destination=$Shirakawa-go%20Gifu%20Japan&travelmode=transit" },
+            { time: "16:00", title: "集合返程", sub: "搭車回名古屋", type: "move", map_link: "" },
+            { time: "18:30", title: "抵達名古屋站", sub: "行程結束 | 原地解散", type: "move", map_link: "https://maps.app.goo.gl/AVfjnzwp8dKhJEZr7" },
+            { time: "19:00", title: "晚餐", sub: "推薦: ESCA地下街 (鰻魚飯/豬排)", type: "food", map_link: "https://maps.app.goo.gl/AVfjnzwp8dKhJEZr7" }
+        ],
+        "2026-02-07": [
+            { time: "11:30", title: "睡飽出門 & 午餐", sub: "飯店附近簡單吃", type: "food", map_link: "https://maps.app.goo.gl/DR5US1Swcfc2goix7" },
+            { 
+                time: "13:00", title: "名古屋港水族館", sub: "看虎鯨表演 | 營業: 09:30-17:00", type: "spot", price: "¥2,030", 
+                map_link: "https://maps.app.goo.gl/cYGYMxxt72wCZP6f6",
+                trans: { mode: "地鐵", time: "約 20 分", route: "鶴舞站 (鶴舞) <i class='fa-solid fa-arrow-right trans-arrow'></i> 上前津站 (上前津) <i class='fa-solid fa-arrow-right trans-arrow'></i> 名古屋港站 (名古屋港)", fare: "¥270" }
+            },
+            { 
+                time: "16:30", title: "大須商店街", sub: "邊走邊吃、逛老街", type: "shop", 
+                map_link: "https://maps.app.goo.gl/S3yZzjWKzA2y1VndA",
+                trans: { mode: "地鐵名港線", time: "約 12 分", route: "名古屋港站 (名古屋港) <i class='fa-solid fa-arrow-right trans-arrow'></i> 上前津站 (上前津)", fare: "¥240" }
+            }
+        ],
+        "2026-02-08": [
+            { time: "10:30", title: "退房 (Check-out)", sub: "行李寄放原飯店櫃台", type: "move", map_link: "https://maps.app.goo.gl/DR5US1Swcfc2goix7" },
+            { 
+                time: "11:00", title: "樂高樂園 (Legoland)", sub: "全日遊玩 | 門票 ¥4,500+", type: "spot", 
+                map_link: "https://maps.app.goo.gl/TFjdqNQxhL2ymve26", map_pdf: "https://www.legoland.jp/zh-hant/resort-guide/legoland/resort-map/",
+                trans: { mode: "青波線", time: "約 24 分", route: "名古屋站 (名古屋) <i class='fa-solid fa-arrow-right trans-arrow'></i> 金城埠頭站 (金城ふ頭)", fare: "¥360" }
+            },
+            { 
+                time: "17:00", title: "回飯店拿行李", sub: "返回 Minn 拿行李", type: "move", 
+                map_link: "https://maps.app.goo.gl/DR5US1Swcfc2goix7",
+                trans: { mode: "JR+青波線", time: "約 50 分", route: "原路返回", fare: "¥560" }
+            },
+            { 
+                time: "17:30", title: "移動 (搭公車/計程車)", sub: "前往新飯店 ACCESS by LOISIR", type: "move", 
+                map_link: "https://maps.app.goo.gl/WxHYX2tt1ChcnupAA",
+                trans: { mode: "市公車 基幹2", time: "約 15 分", route: "鶴舞公園前 (鶴舞公園前) <i class='fa-solid fa-arrow-right trans-arrow'></i> 榮 (栄)", fare: "¥210" }
+            },
+            { time: "19:00", title: "辦理入住", sub: "Check-in 新飯店 | 榮商圈晚餐", type: "move", map_link: "https://maps.app.goo.gl/WxHYX2tt1ChcnupAA" }
+        ],
+        "2026-02-09": [
+            { 
+                time: "11:00", title: "前往名鐵名古屋站", sub: "購買「犬山城下町套票」", type: "move", 
+                map_link: "https://maps.app.goo.gl/AVfjnzwp8dKhJEZr7",
+                trans: { mode: "地鐵東山線", time: "約 5 分", route: "榮站 (栄) <i class='fa-solid fa-arrow-right trans-arrow'></i> 名古屋站 (名古屋)", fare: "¥210" }
+            },
+            { 
+                time: "12:30", title: "犬山城下町", sub: "穿和服、吃糰子 | 午餐", type: "food", 
+                map_link: "https://maps.app.goo.gl/bhBPi6ocA1s7Vp736",
+                trans: { mode: "名鐵犬山線", time: "約 30 分", route: "名鐵名古屋站 (名鉄名古屋) <i class='fa-solid fa-arrow-right trans-arrow'></i> 犬山站 (犬山)", fare: "含在套票" }
+            },
+            { time: "14:00", title: "國寶犬山城", sub: "樓梯陡峭，請小心行走", type: "spot", price: "含在套票", map_link: "https://maps.app.goo.gl/ehBfXebt2aGRw43Z6" },
+            { time: "17:00", title: "返回名古屋", sub: "榮商圈晚餐", type: "food", map_link: "https://maps.app.goo.gl/WxHYX2tt1ChcnupAA" }
+        ],
+        "2026-02-10": [
+            { time: "10:00", title: "出門", sub: "前往科學館", type: "move", map_link: "" },
+            { 
+                time: "10:30", title: "名古屋市科學館", sub: "巨球天文館 | 拍照", type: "spot", price: "¥800", 
+                map_link: "https://maps.app.goo.gl/UnVou8mXZSRbZXnG7",
+                trans: { mode: "地鐵東山線", time: "約 2 分", route: "榮站 (栄) <i class='fa-solid fa-arrow-right trans-arrow'></i> 伏見站 (伏見) (4號出口)", fare: "¥210" }
+            },
+            { 
+                time: "14:00", title: "熱田神宮", sub: "森林浴參拜 | 吃宮棋子麵", type: "spot", price: "免費", 
+                map_link: "https://maps.app.goo.gl/vcDYdRqfpFTo2ep9A",
+                trans: { mode: "地鐵名城線", time: "約 15 分", route: "伏見站 (伏見) <i class='fa-solid fa-arrow-right trans-arrow'></i> 熱田神宮西站 (熱田神宮西)", fare: "¥270" }
+            },
+            { 
+                time: "17:00", title: "返回榮商圈", sub: "最後採買 | 整理行李", type: "shop", 
+                map_link: "https://maps.app.goo.gl/WxHYX2tt1ChcnupAA",
+                trans: { mode: "地鐵名城線", time: "約 10 分", route: "熱田神宮西站 (熱田神宮西) <i class='fa-solid fa-arrow-right trans-arrow'></i> 榮站 (栄)", fare: "¥240" }
+            }
+        ],
+        "2026-02-11": [
+            { time: "10:00", title: "退房 (Check-out)", sub: "行李寄放飯店 | 輕裝逛街", type: "move", map_link: "https://maps.app.goo.gl/WxHYX2tt1ChcnupAA" },
+            { time: "11:00", title: "名古屋站最後採買", sub: "高島屋、千里馬藥局 | 午餐", type: "shop", map_link: "https://maps.app.goo.gl/AVfjnzwp8dKhJEZr7" },
+            { time: "16:00", title: "回飯店拿行李", sub: "出發前往機場", type: "move", map_link: "https://maps.app.goo.gl/WxHYX2tt1ChcnupAA" },
+            { 
+                time: "17:30", title: "抵達機場 T2", sub: "虎航櫃檯報到 | 晚餐", type: "move", 
+                map_link: "https://maps.app.goo.gl/wd1DWZFhuDGnfVhE6",
+                trans: { mode: "名鐵特急", time: "約 35 分", route: "榮站 (栄) <i class='fa-solid fa-arrow-right trans-arrow'></i> 金山站 (金山) <i class='fa-solid fa-arrow-right trans-arrow'></i> 中部國際機場 (中部国際空港)", fare: "約 ¥1,150" }
+            },
+            { time: "19:40", title: "飛機起飛 (IT 269)", sub: "平安回家", type: "move", map_link: "" }
+        ],
+        "backup": [
+            { 
+                time: "09:00", title: "出發前往伊勢", sub: "搭乘 JR 快速三重 (約120分)", type: "move", 
+                map_link: "https://maps.app.goo.gl/gx987dJ1a8qkRURp9",
+                trans: { mode: "JR 快速三重", time: "約 95 分", route: "名古屋站 (名古屋) <i class='fa-solid fa-arrow-right trans-arrow'></i> 伊勢市站 (伊勢市)", fare: "¥2,040" }
+            },
+            { time: "11:00", title: "伊勢神宮 (外宮)", sub: "豐受大神宮 | 參拜", type: "spot", price: "免費", map_link: "https://maps.app.goo.gl/gx987dJ1a8qkRURp9" },
+            { 
+                time: "12:30", title: "搭公車去內宮", sub: "車程約 20 分", type: "move", 
+                map_link: "https://maps.app.goo.gl/5KjRMc7oSa3pf4Dg9",
+                trans: { mode: "三重交通巴士", time: "約 20 分", route: "Geku-mae (外宮前) <i class='fa-solid fa-arrow-right trans-arrow'></i> Naiku-mae (内宮前)", fare: "¥520" }
+            },
+            { time: "13:00", title: "伊勢神宮 (內宮)", sub: "皇大神宮 | 日本地位最高神社", type: "spot", price: "免費", map_link: "https://maps.app.goo.gl/5KjRMc7oSa3pf4Dg9" },
+            { time: "15:00", title: "托福橫丁", sub: "老街吃赤福、松阪牛串", type: "food", map_link: "https://maps.app.goo.gl/5KjRMc7oSa3pf4Dg9" },
+            { time: "16:30", title: "返回名古屋", sub: "車程約 2 小時", type: "move", map_link: "https://maps.app.goo.gl/AVfjnzwp8dKhJEZr7" }
+        ]
+    };
+
+    let currentDate = "2026-02-04";
+
+    // --- Core UI Functions ---
+    window.switchTab = function(tabId, btn) {
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function init() {
+        renderDates();
+        renderTimeline();
+        fetchWeather(currentDate);
+    }
+
+    function renderDates() {
+        const wrapper = document.getElementById('date-scroll');
+        wrapper.innerHTML = '';
+        Object.keys(tripData).forEach(date => {
+            if(date === "backup") return; 
+            const d = new Date(date);
+            const dayName = d.toLocaleDateString('zh-TW', {weekday: 'short'});
+            const md = `${d.getMonth()+1}/${d.getDate()}`;
+            const chip = document.createElement('div');
+            chip.className = `date-chip ${date === currentDate ? 'active' : ''}`;
+            chip.innerHTML = `<div class="day">${dayName}</div><div class="date">${md}</div>`;
+            chip.onclick = () => { currentDate = date; renderDates(); renderTimeline(); fetchWeather(date); };
+            wrapper.appendChild(chip);
+        });
+        const backupChip = document.createElement('div');
+        backupChip.className = `date-chip backup ${currentDate === 'backup' ? 'active' : ''}`;
+        backupChip.innerHTML = `<div class="day">Plan B</div><div class="date">備案</div>`;
+        backupChip.onclick = () => { currentDate = "backup"; renderDates(); renderTimeline(); fetchWeather("backup"); };
+        wrapper.appendChild(backupChip);
+    }
+
+    function renderTimeline() {
+        const container = document.getElementById('itinerary-list');
+        container.innerHTML = '';
+        const items = tripData[currentDate] || [];
+        
+        if(currentDate === 'backup') {
+            const banner = document.createElement('div');
+            banner.className = 'backup-banner';
+            banner.innerHTML = '<i class="fa-solid fa-circle-exclamation" style="font-size:28px"></i> <div><strong>備用行程</strong><br>若合掌村天氣不好可去伊勢神宮</div>';
+            container.appendChild(banner);
+        }
+        
+        items.forEach(item => {
+            let tagsHtml = '';
+            if(item.type === 'food') tagsHtml += `<span class="tag tag-food"><i class="fa-solid fa-utensils"></i> 美食</span>`;
+            if(item.type === 'shop') tagsHtml += `<span class="tag tag-shop"><i class="fa-solid fa-bag-shopping"></i> 購物</span>`;
+            if(item.type === 'move') tagsHtml += `<span class="tag tag-trans"><i class="fa-solid fa-route"></i> 交通</span>`;
+            if(item.type === 'spot') tagsHtml += `<span class="tag tag-spot"><i class="fa-solid fa-camera"></i> 景點</span>`;
+            if(item.price) tagsHtml += `<span class="tag tag-price"><i class="fa-solid fa-ticket"></i> ${item.price}</span>`;
+            if(item.sub.includes('⚠️')) tagsHtml += `<span class="tag tag-warn">注意</span>`;
+
+            let href = item.map_link ? item.map_link : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.title + " Nagoya Japan")}&travelmode=transit`;
+            let btnStyle = item.map_link === "" ? "display:none" : "";
+            let mapBtnHtml = "";
+            if(item.map_pdf) { mapBtnHtml = `<a href="${item.map_pdf}" target="_blank" class="map-btn"><i class="fa-solid fa-map"></i> 下載樂園地圖</a>`; }
+
+            let transHtml = "";
+            if(item.trans) {
+                transHtml = `
+                    <div class="trans-box">
+                        <div class="trans-title">
+                            <i class="fa-solid fa-train"></i> ${item.trans.mode} 
+                            <span class="trans-time">⏱️ ${item.trans.time}</span>
+                        </div>
+                        <div class="trans-route">
+                            ${item.trans.route}
+                            <span class="trans-fare">${item.trans.fare}</span>
+                        </div>
+                    </div>`;
+            }
+
+            const card = document.createElement('div');
+            card.className = 'timeline-card';
+            card.innerHTML = `
+                <div class="timeline-line"></div>
+                <div class="card-header"><div class="time">${item.time}</div><div class="title">${item.title}</div></div>
+                <div class="card-body">
+                    <div class="tag-row">${tagsHtml}</div>
+                    <div style="margin-bottom:10px;">${item.sub}</div>
+                    ${transHtml}
+                    <div class="btn-group">
+                        <a href="${href}" target="_blank" class="nav-btn" style="${btnStyle}"><i class="fa-solid fa-location-arrow"></i> 導航這裡</a>
+                        ${mapBtnHtml}
+                    </div>
+                </div>`;
+            container.appendChild(card);
+        });
+    }
+
+    async function fetchWeather(dateStr) {
+        const banner = document.getElementById('weather-banner');
+        if (dateStr === "backup") {
+            banner.innerHTML = `<i class="fa-solid fa-sun" style="color:#FF7043; font-size:28px;"></i> 伊勢市預報: 晴時多雲 10°C`;
+            return;
+        }
+        banner.innerHTML = '<span style="color:#607D8B"><i class="fa-solid fa-spinner fa-spin"></i> 正在更新即時天氣...</span>';
+        
+        const fallback = {
+            "2026-02-04": { icon: "fa-cloud", text: "多雲 8°C (需帶外套)", color: "#78909C" },
+            "2026-02-05": { icon: "fa-sun", text: "晴時多雲 12°C (舒適)", color: "#FBC02D" },
+            "2026-02-06": { icon: "fa-snowflake", text: "合掌村可能積雪 2°C (保暖!)", color: "#4FC3F7" },
+            "default": { icon: "fa-sun", text: "預報: 晴朗 10°C", color: "#FBC02D" }
+        };
+        
+        let lat = 35.1815, lon = 136.9066; 
+        if (dateStr === "2026-02-06") { lat = 36.2565; lon = 136.9032; }
+
+        try {
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo&start_date=${dateStr}&end_date=${dateStr}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            if (data.daily && data.daily.time.length > 0) {
+                const code = data.daily.weather_code[0];
+                const maxT = Math.round(data.daily.temperature_2m_max[0]);
+                const minT = Math.round(data.daily.temperature_2m_min[0]);
+                let wInfo = { icon: "fa-cloud", text: "陰天", color: "#78909C" };
+                if (code === 0) wInfo = { icon: "fa-sun", text: "晴朗", color: "#FBC02D" };
+                else if (code <= 3) wInfo = { icon: "fa-cloud-sun", text: "多雲", color: "#546E7A" };
+                else if (code >= 51) wInfo = { icon: "fa-umbrella", text: "有雨", color: "#42A5F5" };
+                else if (code >= 71) wInfo = { icon: "fa-snowflake", text: "降雪", color: "#4FC3F7" };
+                
+                banner.innerHTML = `<i class="fa-solid ${wInfo.icon}" style="color:${wInfo.color}; font-size:28px;"></i> ${wInfo.text} ${minT}~${maxT}°C`;
+            } else { throw new Error("No data"); }
+        } catch (e) {
+            const fb = fallback[dateStr] || fallback["default"];
+            banner.innerHTML = `<i class="fa-solid ${fb.icon}" style="color:${fb.color}; font-size:28px;"></i> ${fb.text}`;
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>
