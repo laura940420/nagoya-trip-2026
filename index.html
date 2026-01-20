@@ -347,25 +347,85 @@
     // --- V9.1 Data (Short lines, Foggy Blue, Detailed Trans) ---
     const tripData = {
         "2026-02-04": [
+
             { 
-                time: "18:50", title: "抵達中部國際機場", sub: "入境 (T2航廈) -> 步行至 T1", type: "move", 
-                map_link: "https://maps.app.goo.gl/wd1DWZFhuDGnfVhE6",
-                trans: { mode: "名鐵特急", time: "約 35 分", route: "中部國際機場 (中部国際空港) <i class='fa-solid fa-arrow-right trans-arrow'></i> 金山站 (金山) <i class='fa-solid fa-arrow-right trans-arrow'></i> 鶴舞站 (鶴舞)", fare: "約 ¥1,100" }
+
+                time: "18:50", 
+
+                title: "抵達中部國際機場", 
+
+                sub: "入境 (T2航廈) -> 步行至 T1 名鐵改札口", 
+
+                type: "move", 
+
+                map_link: "https://maps.app.goo.gl/wd1DWZFhuDGnfVhE6", 
+
+                trans: { 
+
+                    mode: "名鐵特急 + JR中央線", // 修正：明確寫出兩種交通工具
+
+                    time: "約 55 分", // 修正：35分車程 + 15分轉乘緩衝 + 3分JR
+
+                    // 修正：在金山站加入醒目的「轉乘」提示
+
+                    route: "機場 (中部国際空港) <i class='fa-solid fa-arrow-right trans-arrow'></i> 金山站 <span style='color:#D84315;font-weight:900;background:#FFCCBC;padding:0 4px;border-radius:4px;font-size:12px;'>轉乘JR</span> <i class='fa-solid fa-arrow-right trans-arrow'></i> 鶴舞站", 
+
+                    fare: "¥890+¥160" // 分開寫比較清楚
+
+                } 
+
             },
+
             { 
-                time: "19:40", title: "前往飯店: Minn STATION Ai", sub: "車程約 60 分 | 辦理入住", type: "move", 
-                map_link: "https://maps.app.goo.gl/DR5US1Swcfc2goix7",
-                trans: { mode: "JR 中央線", time: "約 3 分", route: "金山站 (金山) <i class='fa-solid fa-arrow-right trans-arrow'></i> 鶴舞站 (鶴舞)", fare: "¥150" }
+
+                time: "20:00", // 修正：時間往後推，因為18:50落地+入境+搭車不太可能19:40就到飯店
+
+                title: "前往飯店: Minn STATION Ai", 
+
+                sub: "JR 鶴舞站「公園口」出站 -> 步行約 7 分鐘", // 修正：這裡專注寫出站後的步行
+
+                type: "move", 
+
+                map_link: "https://maps.app.goo.gl/DR5US1Swcfc2goix7", 
+
+                // 這裡移除了重複的 JR 交通資訊，改為步行指引
+
+                trans: { 
+
+                    mode: "步行前往", 
+
+                    time: "約 7 分", 
+
+                    route: "沿著高架橋走 (STATION Ai 7F)"
+
+fare: "¥0", 
+
+                      } 
+
             },
-            { time: "21:00", title: "附近晚餐", sub: "便利商店或周邊餐廳", type: "food", map_link: "https://maps.app.goo.gl/DR5US1Swcfc2goix7" }
-        ],
+
+            { 
+
+                time: "20:30", 
+
+                title: "附近晚餐", 
+
+                sub: "飯店樓下或車站附近餐廳", 
+
+                type: "food", 
+
+                map_link: "https://maps.app.goo.gl/DR5US1Swcfc2goix7" 
+
+            }
+
+        ],        
         "2026-02-05": [
             { 
                 time: "10:30", title: "出發 (德川園)", sub: "睡飽出門 | 車程約 30 分", type: "move", 
                 map_link: "https://maps.app.goo.gl/2hmRJcyDmzC3AqzQ7https://maps.app.goo.gl/wurExDasHoXdrqjT8",
                 trans: { mode: "JR 中央線", time: "約 4 分", route: "鶴舞站 (鶴舞) <i class='fa-solid fa-arrow-right trans-arrow'></i> 大曾根站 (大曽根) (南口出步行10分)", fare: "¥200" }
             },
-            { time: "11:00", title: "德川園 (Tokugawaen)", sub: "日式庭園 | 門票 ¥300", type: "spot", map_link: "https://maps.app.goo.gl/2hmRJcyDmzC3AqzQ7https://maps.app.goo.gl/wurExDasHoXdrqjT8" },
+            { time: "11:00", title: "德川園 (Tokugawaen)", sub: "日式庭園", type: "spot", price: "¥300", map_link: "https://maps.app.goo.gl/2hmRJcyDmzC3AqzQ7https://maps.app.goo.gl/wurExDasHoXdrqjT8" },
             { time: "12:00", title: "午餐", sub: "園區或附近用餐", type: "food", map_link: "" },
             { 
                 time: "13:30", title: "名古屋城 (本丸御殿)", sub: "參觀宮殿 | ⚠️天守閣整修中", type: "spot", price: "¥500", 
@@ -412,7 +472,7 @@
         "2026-02-08": [
             { time: "10:30", title: "退房 (Check-out)", sub: "行李寄放原飯店櫃台", type: "move", map_link: "https://maps.app.goo.gl/DR5US1Swcfc2goix7" },
             { 
-                time: "11:00", title: "樂高樂園 (Legoland)", sub: "全日遊玩 | 門票 ¥4,500+", type: "spot", 
+                time: "11:00", title: "樂高樂園 (Legoland)", sub: "全日遊玩 ", type: "spot" ,price: "¥4,500+", 
                 map_link: "https://maps.app.goo.gl/TFjdqNQxhL2ymve26", map_pdf: "https://www.legoland.jp/zh-hant/resort-guide/legoland/resort-map/",
                 trans: { mode: "青波線", time: "約 24 分", route: "名古屋站 (名古屋) <i class='fa-solid fa-arrow-right trans-arrow'></i> 金城埠頭站 (金城ふ頭)", fare: "¥360" }
             },
@@ -430,8 +490,7 @@
         ],
         "2026-02-09": [
             { 
-                time: "11:00", title: "前往名鐵名古屋站", sub: "購買「犬山城下町套票」", type: "move", 
-                map_link: "https://maps.app.goo.gl/AVfjnzwp8dKhJEZr7",
+                time: "11:00", title: "前往名鐵名古屋站", sub: "在名鐵名古屋車站購買「犬山城下町套票」，套票包含「名鐵任一站到犬山站/犬山遊園站的來回車票」+ 「犬山城入場券」+「犬山指定店家優惠券（10多間店選3間）」+「有楽苑 入場折價券」", type: "move",price: "¥1,630", map_link: "https://maps.app.goo.gl/AVfjnzwp8dKhJEZr7",
                 trans: { mode: "地鐵東山線", time: "約 5 分", route: "榮站 (栄) <i class='fa-solid fa-arrow-right trans-arrow'></i> 名古屋站 (名古屋)", fare: "¥210" }
             },
             { 
@@ -630,6 +689,7 @@
 </body>
 
 </html>
+
 
 
 
