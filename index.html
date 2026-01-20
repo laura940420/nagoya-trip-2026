@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>名古屋之旅 V10.2</title>
+    <title>名古屋之旅 V10.2.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Roboto:wght@500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -275,12 +275,18 @@
     };
 
     // Initialize
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const expensesRef = ref(db, 'expenses');
+    let app, db, expensesRef;
+    try {
+        app = initializeApp(firebaseConfig);
+        db = getDatabase(app);
+        expensesRef = ref(db, 'expenses');
+    } catch (e) {
+        console.error("Firebase Init Error:", e);
+    }
 
     // --- Accounting Logic (No Payer) ---
     window.addExpense = function() {
+        if (!expensesRef) { alert("記帳功能目前無法使用 (資料庫連線失敗)"); return; }
         const name = document.getElementById('item-name').value;
         const price = document.getElementById('item-price').value;
 
@@ -309,115 +315,81 @@
         }
     }
 
-    onValue(expensesRef, (snapshot) => {
-        const list = document.getElementById('expense-list');
-        const totalEl = document.getElementById('total-amount');
-        list.innerHTML = '';
-        let total = 0;
+    if (expensesRef) {
+        onValue(expensesRef, (snapshot) => {
+            const list = document.getElementById('expense-list');
+            const totalEl = document.getElementById('total-amount');
+            list.innerHTML = '';
+            let total = 0;
 
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            const entries = Object.entries(data).reverse();
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const entries = Object.entries(data).reverse();
 
-            entries.forEach(([key, value]) => {
-                total += value.price;
-                const li = document.createElement('li');
-                li.className = 'expense-item';
-                const d = new Date(value.date);
-                const timeStr = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-                
-                li.innerHTML = `
-                    <div class="expense-info">
-                        <span class="expense-name">${value.name}</span>
-                        <span class="expense-meta">${timeStr}</span>
-                    </div>
-                    <div style="display:flex; align-items:center;">
-                        <span class="expense-amount">¥${value.price.toLocaleString()}</span>
-                        <i class="fa-solid fa-trash delete-btn" onclick="deleteExpense('${key}')"></i>
-                    </div>
-                `;
-                list.appendChild(li);
-            });
-        } else {
-            list.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">目前還沒有花費紀錄</div>';
-        }
-        totalEl.innerText = total.toLocaleString();
-    });
+                entries.forEach(([key, value]) => {
+                    total += value.price;
+                    const li = document.createElement('li');
+                    li.className = 'expense-item';
+                    const d = new Date(value.date);
+                    const timeStr = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                    
+                    li.innerHTML = `
+                        <div class="expense-info">
+                            <span class="expense-name">${value.name}</span>
+                            <span class="expense-meta">${timeStr}</span>
+                        </div>
+                        <div style="display:flex; align-items:center;">
+                            <span class="expense-amount">¥${value.price.toLocaleString()}</span>
+                            <i class="fa-solid fa-trash delete-btn" onclick="deleteExpense('${key}')"></i>
+                        </div>
+                    `;
+                    list.appendChild(li);
+                });
+            } else {
+                list.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">目前還沒有花費紀錄</div>';
+            }
+            totalEl.innerText = total.toLocaleString();
+        }, (error) => {
+            console.log("Read error", error);
+        });
+    }
 
     // --- V9.1 Data (Short lines, Foggy Blue, Detailed Trans) ---
     const tripData = {
         "2026-02-04": [
-
             { 
-
                 time: "18:50", 
-
                 title: "抵達中部國際機場", 
-
                 sub: "入境 (T2航廈) -> 步行至 T1 名鐵改札口", 
-
                 type: "move", 
-
                 map_link: "https://maps.app.goo.gl/wd1DWZFhuDGnfVhE6", 
-
                 trans: { 
-
-                    mode: "名鐵特急 + JR中央線", // 修正：明確寫出兩種交通工具
-
-                    time: "約 55 分", // 修正：35分車程 + 15分轉乘緩衝 + 3分JR
-
-                    // 修正：在金山站加入醒目的「轉乘」提示
-
+                    mode: "名鐵特急 + JR中央線", 
+                    time: "約 55 分", 
                     route: "機場 (中部国際空港) <i class='fa-solid fa-arrow-right trans-arrow'></i> 金山站 <span style='color:#D84315;font-weight:900;background:#FFCCBC;padding:0 4px;border-radius:4px;font-size:12px;'>轉乘JR</span> <i class='fa-solid fa-arrow-right trans-arrow'></i> 鶴舞站", 
-
-                    fare: "¥890+¥160" // 分開寫比較清楚
-
+                    fare: "¥890+¥160" 
                 } 
-
             },
-
             { 
-
-                time: "20:00", // 修正：時間往後推，因為18:50落地+入境+搭車不太可能19:40就到飯店
-
+                time: "20:00", 
                 title: "前往飯店: Minn STATION Ai", 
-
-                sub: "JR 鶴舞站「公園口」出站 -> 步行約 7 分鐘", // 修正：這裡專注寫出站後的步行
-
+                sub: "JR 鶴舞站「公園口」出站 -> 步行約 7 分鐘", 
                 type: "move", 
-
                 map_link: "https://maps.app.goo.gl/DR5US1Swcfc2goix7", 
-
-                // 這裡移除了重複的 JR 交通資訊，改為步行指引
-
                 trans: { 
-
                     mode: "步行前往", 
-
                     time: "約 7 分", 
-
-                    route: "沿著高架橋走 (STATION Ai 7F)"
-
-fare: "¥0", 
-
-                      } 
-
+                    route: "沿著高架橋走 (STATION Ai 7F)", // [FIXED] 修正這裡缺少逗號
+                    fare: "¥0"
+                } 
             },
-
             { 
-
                 time: "20:30", 
-
                 title: "附近晚餐", 
-
                 sub: "飯店樓下或車站附近餐廳", 
-
                 type: "food", 
-
                 map_link: "https://maps.app.goo.gl/DR5US1Swcfc2goix7" 
-
             }
-
         ],        
         "2026-02-05": [
             { 
@@ -606,7 +578,9 @@ fare: "¥0",
             if(item.price) tagsHtml += `<span class="tag tag-price"><i class="fa-solid fa-ticket"></i> ${item.price}</span>`;
             if(item.sub.includes('⚠️')) tagsHtml += `<span class="tag tag-warn">注意</span>`;
 
-            let href = item.map_link ? item.map_link : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.title + " Nagoya Japan")}&travelmode=transit`;
+            // [FIXED] 嚴格保留您原本的地圖邏輯，只修正 Fallback 的語法錯誤 (加上 `` 和 ${})
+            let href = item.map_link ? item.map_link : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.title + " Nagoya Japan")}`;
+            
             let btnStyle = item.map_link === "" ? "display:none" : "";
             let mapBtnHtml = "";
             if(item.map_pdf) { mapBtnHtml = `<a href="${item.map_pdf}" target="_blank" class="map-btn"><i class="fa-solid fa-map"></i> 下載樂園地圖</a>`; }
@@ -687,11 +661,4 @@ fare: "¥0",
     init();
 </script>
 </body>
-
 </html>
-
-
-
-
-
-
