@@ -3,31 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>名古屋之旅 V10.2.1</title>
+    <title>名古屋之旅 V10.2.4 Lively Blue</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Roboto:wght@500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            /* V9.1 霧藍色配色 (Foggy Blue) */
-            --bg-color: #F0F4F8;
+            /* V10.2.4 活潑藍色配色 (Lively Dreamy Blue) - 基底維持 V10.2.3 */
+            --bg-color: #E3F2FD;
             --card-bg: #FFFFFF;
-            --text-main: #37474F;
-            --text-sub: #607D8B;
-            --primary: #546E7A;
-            --primary-dark: #263238;
-            --header-gradient: linear-gradient(135deg, #78909C 0%, #455A64 100%);
+            --text-main: #37474F; 
+            --text-sub: #78909C;
+            --primary: #42A5F5; 
+            --primary-dark: #1565C0;
+            --header-gradient: linear-gradient(135deg, #64B5F6 0%, #1976D2 100%);
             --accent: #FF7043;
             
             --tag-food-bg: #FFF3E0; --tag-food-text: #E65100;
-            --tag-shop-bg: #F3E5F5; --tag-shop-text: #6A1B9A;
-            --tag-trans-bg: #E1F5FE; --tag-trans-text: #0277BD;
-            --tag-spot-bg: #E8F5E9; --tag-spot-text: #2E7D32;
+            --tag-shop-bg: #E1F5FE; --tag-shop-text: #0277BD;
+            --tag-trans-bg: #F3E5F5; --tag-trans-text: #7B1FA2;
+            --tag-spot-bg: #E0F2F1; --tag-spot-text: #00695C;
             --tag-price-bg: #F5F5F5; --tag-price-text: #546E7A;
             --tag-warn-bg: #FFEBEE; --tag-warn-text: #C62828;
 
-            --radius: 14px;
-            --shadow: 0 4px 12px rgba(84, 110, 122, 0.12);
+            --radius: 16px;
+            --shadow: 0 4px 12px rgba(66, 165, 245, 0.15);
             --safe-bottom: env(safe-area-inset-bottom);
         }
 
@@ -41,19 +41,28 @@
             height: 100vh;
             display: flex; flex-direction: column;
             overflow: hidden;
-            font-size: 15px;
-            background-image: linear-gradient(to bottom, #F0F4F8 0%, #FFFFFF 100%);
-        }
+            font-size: 14px;
+                 }
 
         header { 
             padding: 20px 20px 15px; 
             background: var(--header-gradient); 
             z-index: 10; color: #FFFFFF;
-            box-shadow: 0 4px 8px rgba(55, 71, 79, 0.2);
-            border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
+            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.2);
+            border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
+            position: relative; overflow: hidden;
         }
-        .app-title { font-size: 26px; font-weight: 900; color: #FFFFFF; display: flex; align-items: center; gap: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .app-subtitle { font-size: 16px; color: rgba(255,255,255,0.85); margin-left: 42px; margin-top: 5px; font-weight: 700; letter-spacing: 0.5px; }
+        /* V10.2.4 新增：Header 右上角的裝飾性飛機 */
+        header::after {
+            content: '\f5b0'; /* FA-plane-departure */
+            font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; right: 20px; top: 10px;
+            font-size: 50px; color: rgba(255,255,255,0.15);
+            transform: rotate(-15deg); pointer-events: none;
+        }
+
+        .app-title { font-size: 24px; font-weight: 900; color: #FFFFFF; display: flex; align-items: center; gap: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; z-index: 1;}
+        .app-subtitle { font-size: 14px; color: rgba(255,255,255,0.9); margin-left: 38px; margin-top: 5px; font-weight: 700; letter-spacing: 0.5px; position: relative; z-index: 1;}
 
         main { flex: 1; overflow-y: auto; padding-bottom: calc(100px + var(--safe-bottom)); scroll-behavior: smooth; }
         .view-section { display: none; padding: 0 16px; animation: fadeIn 0.4s ease; }
@@ -61,62 +70,87 @@
         @keyframes fadeIn { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
 
         .date-scroller-wrapper { position: sticky; top: 0; z-index: 20; background: transparent; padding: 15px 0 10px; margin: 0 5px; }
-        .date-scroller { display: flex; overflow-x: auto; gap: 12px; scrollbar-width: none; padding: 0 10px; }
+        .date-scroller { display: flex; overflow-x: auto; gap: 10px; scrollbar-width: none; padding: 0 10px; }
         .date-chip { 
-            flex: 0 0 auto; min-width: 75px; text-align: center; padding: 12px 0; 
-            background: rgba(255,255,255,0.95); border-radius: 12px; 
+            flex: 0 0 auto; min-width: 70px; text-align: center; padding: 10px 0; 
+            background: rgba(255,255,255,0.9); border-radius: 12px; 
             color: var(--text-sub); transition: all 0.3s ease; 
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06); border: 1px solid #CFD8DC; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06); border: 1px solid #E1F5FE;
+            position: relative;
         }
         .date-chip.active { 
             background: var(--primary); color: white; 
             transform: translateY(-4px); 
-            box-shadow: 0 6px 12px rgba(84, 110, 122, 0.4); 
+            box-shadow: 0 6px 12px rgba(66, 165, 245, 0.4); 
             border-color: transparent; 
         }
+        /* V10.2.4 新增：選中日期上面的小裝飾 */
+        .date-chip.active::before {
+            content: '\f005'; /* Star */
+            font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+            font-size: 12px; color: #FFD54F; text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
         .date-chip.backup { border: 2px solid var(--accent); color: var(--accent); background: #FFF; }
         .date-chip.backup.active { background: var(--accent); color: white; border-color: var(--accent); }
-        .date-chip .day { font-size: 15px; margin-bottom: 4px; font-weight: 700; }
-        .date-chip .date { font-size: 20px; font-weight: 900; font-family: 'Roboto'; }
+        .date-chip .day { font-size: 13px; margin-bottom: 4px; font-weight: 700; }
+        .date-chip .date { font-size: 18px; font-weight: 900; font-family: 'Roboto'; }
 
         .timeline-container { position: relative; padding-left: 10px; margin-top: 15px; }
         .timeline-card { 
-            background: var(--card-bg); border-radius: var(--radius); padding: 22px; 
-            margin-bottom: 20px; box-shadow: var(--shadow); 
+            background: var(--card-bg); border-radius: var(--radius); padding: 20px; 
+            margin-bottom: 18px; box-shadow: var(--shadow); 
             position: relative; z-index: 1; border-left: 5px solid var(--primary); 
             overflow: hidden;
         }
+
+        /* V10.2.4 重點新增：卡片右上方的大型裝飾圖示 */
+        /* 透過 JS 加入的 data-type 屬性來判斷顯示什麼圖案 */
+        .timeline-card::after {
+            font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; top: 10px; right: 15px;
+            font-size: 70px; opacity: 0.06; transform: rotate(10deg);
+            pointer-events: none; z-index: 0; transition: all 0.3s;
+        }
+        /* 預設圖示 */
+        .timeline-card::after { content: '\f3c5'; color: var(--primary); } /* map-marker */
+        /* 不同類型的專屬圖示與顏色 */
+        .timeline-card[data-type="food"]::after { content: '\f2e7'; color: var(--tag-food-text); opacity: 0.08; } /* utensils */
+        .timeline-card[data-type="spot"]::after { content: '\f030'; color: var(--tag-spot-text); opacity: 0.08; } /* camera */
+        .timeline-card[data-type="shop"]::after { content: '\f291'; color: var(--tag-shop-text); opacity: 0.08; } /* shopping-basket */
+        .timeline-card[data-type="move"]::after { content: '\f0ec'; color: var(--tag-trans-text); opacity: 0.07; } /* exchange */
+
+
         .timeline-line { 
-            position: absolute; 
-            left: 34px; 
-            top: 70px;    
-            bottom: 20px; 
-            width: 2px; 
-            background: #CFD8DC; 
-            z-index: 0; 
+            position: absolute; left: 32px; top: 70px; bottom: 20px; 
+            width: 2px; background: #CFD8DC; z-index: 0; 
+            /* V10.2.4：線條改成虛線更活潑 */
+            background: repeating-linear-gradient(to bottom, #CFD8DC 0, #CFD8DC 6px, transparent 6px, transparent 12px);
         }
         .timeline-card:last-child .timeline-line { display: none; }
-        .card-header { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 12px; }
-        .time { font-family: 'Roboto'; font-weight: 900; color: var(--primary); font-size: 22px; min-width: 65px; margin-top: 2px; }
-        .title { font-size: 22px; font-weight: 900; color: var(--text-main); line-height: 1.4; flex: 1; }
-        .card-body { margin-left: 80px; font-size: 18px; color: var(--text-main); line-height: 1.6; }
+        
+        /* 卡片內容層級要拉高，才不會被裝飾圖示蓋住 */
+        .card-header, .card-body { position: relative; z-index: 1; }
+
+        .card-header { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 10px; }
+        .time { font-family: 'Roboto'; font-weight: 900; color: var(--primary); font-size: 20px; min-width: 60px; margin-top: 2px; }
+        .title { font-size: 18px; font-weight: 900; color: var(--text-main); line-height: 1.4; flex: 1; }
+        .card-body { margin-left: 75px; font-size: 15px; color: var(--text-main); line-height: 1.6; }
 
         .trans-box {
-            background: #ECEFF1;
-            border-left: 4px solid #78909C;
-            padding: 14px; margin: 10px 0 15px;
-            border-radius: 6px;
-            font-size: 17px; color: #37474F;
+            background: #F3FAFF; border-left: 4px solid #90CAF9;
+            padding: 12px; margin: 10px 0 15px; border-radius: 8px;
+            font-size: 15px; color: #455A64;
         }
-        .trans-title { font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; color: #455A64; }
-        .trans-time { background: #CFD8DC; color: #37474F; font-size: 14px; padding: 2px 8px; border-radius: 10px; margin-left: auto; }
-        .trans-route { font-size: 17px; line-height: 1.6; color: #37474F; font-weight: 500; }
-        .trans-fare { font-weight: 700; color: #D84315; margin-left: 8px; font-family: 'Roboto'; font-size: 15px; background: #FFCCBC; padding: 2px 6px; border-radius: 4px;}
-        .trans-arrow { color: #90A4AE; margin: 0 5px; font-size: 14px; }
-        .jp-station { color: #78909C; font-size: 15px; font-weight: 400; margin-left: 4px; }
-
-        .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-        .tag { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 8px; font-size: 15px; font-weight: 700; }
+        .trans-title { font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; color: #546E7A; }
+        .trans-time { background: #E1F5FE; color: #0277BD; font-size: 13px; padding: 2px 8px; border-radius: 10px; margin-left: auto; font-weight:700;}
+        .trans-route { font-size: 15px; line-height: 1.6; color: #37474F; font-weight: 500; }
+        .trans-fare { font-weight: 700; color: #D84315; margin-left: 8px; font-family: 'Roboto'; font-size: 14px; background: #FFCCBC; padding: 2px 6px; border-radius: 4px;}
+        .trans-arrow { color: #90CAF9; margin: 0 5px; font-size: 14px; }
+        
+        .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+        .tag { display: inline-flex; align-items: center; padding: 5px 10px; border-radius: 8px; font-size: 13px; font-weight: 700; }
         .tag-food { background: var(--tag-food-bg); color: var(--tag-food-text); }
         .tag-shop { background: var(--tag-shop-bg); color: var(--tag-shop-text); }
         .tag-trans { background: var(--tag-trans-bg); color: var(--tag-trans-text); }
@@ -124,41 +158,60 @@
         .tag-price { background: var(--tag-price-bg); color: var(--tag-price-text); border: 1px solid #CFD8DC; }
         .tag-warn { background: var(--tag-warn-bg); color: var(--tag-warn-text); font-weight: 900; border: 2px solid #FFCDD2; }
 
-        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 18px; }
-        .nav-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: white; color: var(--primary); padding: 14px 20px; border-radius: 50px; text-decoration: none; font-size: 18px; font-weight: 700; border: 2px solid #B0BEC5; width: 100%; transition: all 0.2s; }
-        .nav-btn:active { background: #ECEFF1; transform: scale(0.98); }
-        .map-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: #FFECB3; color: #E65100; padding: 14px 20px; border-radius: 50px; text-decoration: none; font-size: 18px; font-weight: 700; width: 100%; border: 1px solid #FFE082; }
+        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .nav-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: white; color: var(--primary); padding: 12px 20px; border-radius: 50px; text-decoration: none; font-size: 16px; font-weight: 700; border: 2px solid #BBDEFB; width: 100%; transition: all 0.2s; }
+        .nav-btn:active { background: #E3F2FD; transform: scale(0.98); }
+        .map-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: #FFF3E0; color: #E65100; padding: 12px 20px; border-radius: 50px; text-decoration: none; font-size: 16px; font-weight: 700; width: 100%; border: 1px solid #FFE0B2; }
 
-        .flight-card, .hotel-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); margin-bottom: 30px; border: 1px solid #CFD8DC; }
-        .flight-header { background: #546E7A; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: 700; }
-        .flight-body { padding: 25px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .airport-code { font-size: 32px; font-weight: 900; color: #37474F; }
-        .airport-name { font-size: 16px; color: #90A4AE; margin-top: 5px; font-weight: 500; }
-        .flight-times { margin-top: 0; display: flex; justify-content: space-between; font-size: 22px; font-weight: 700; color: #37474F; padding: 0 20px 25px; }
-        .hotel-card { padding: 25px; border-left: 8px solid var(--accent); }
-        .hotel-name { font-size: 22px; font-weight: 900; color: #37474F; margin-bottom: 10px; }
-        .hotel-date { font-size: 18px; color: var(--accent); font-weight: 700; margin-bottom: 15px; display: block; }
-        .hotel-addr { font-size: 16px; color: #607D8B; line-height: 1.5; margin-bottom: 20px; }
+        .flight-card, .hotel-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid #E3F2FD; position: relative; }
+        /* V10.2.4 新增：機票卡片的背景裝飾 */
+        .flight-card::before {
+            content: '\f072'; /* Plane */
+            font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-20deg);
+            font-size: 120px; color: rgba(66, 165, 245, 0.05); pointer-events: none;
+        }
+        /* V10.2.4 新增：住宿卡片的背景裝飾 */
+        .hotel-card::before {
+            content: '\f1ad'; /* Building */
+            font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; right: 20px; bottom: 10px;
+            font-size: 100px; color: rgba(255, 112, 67, 0.07); pointer-events: none; transform: rotate(10deg);
+        }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #FFFFFF; border-top: 1px solid #CFD8DC; display: flex; justify-content: space-around; padding: 15px 0 calc(15px + var(--safe-bottom)); z-index: 100; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #B0BEC5; font-size: 14px; cursor: pointer; width: 80px; gap: 6px; }
-        .nav-item i { font-size: 28px; margin-bottom: 2px; }
+        .flight-header { background: #546E7A; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 700; position: relative; z-index: 1; }
+        .flight-body { padding: 20px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1; }
+        .airport-code { font-size: 28px; font-weight: 900; color: #37474F; }
+        .airport-name { font-size: 14px; color: #90A4AE; margin-top: 5px; font-weight: 500; }
+        .flight-times { margin-top: 0; display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; color: #37474F; padding: 0 20px 20px; position: relative; z-index: 1; }
+        .hotel-card { padding: 20px; border-left: 8px solid var(--accent); }
+        .hotel-name { font-size: 20px; font-weight: 900; color: #37474F; margin-bottom: 8px; position: relative; z-index: 1; }
+        .hotel-date { font-size: 16px; color: var(--accent); font-weight: 700; margin-bottom: 12px; display: block; position: relative; z-index: 1; }
+        .hotel-addr { font-size: 15px; color: #607D8B; line-height: 1.5; margin-bottom: 15px; position: relative; z-index: 1; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.98); border-top: 1px solid #E3F2FD; display: flex; justify-content: space-around; padding: 12px 0 calc(12px + var(--safe-bottom)); z-index: 100; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #B0BEC5; font-size: 12px; cursor: pointer; width: 80px; gap: 4px; transition: all 0.3s;}
+        .nav-item i { font-size: 24px; margin-bottom: 2px; transition: all 0.3s; }
         .nav-item.active { color: var(--primary); font-weight: 900; }
+        /* V10.2.4 新增：底部導航點擊時的小動畫 */
+        .nav-item.active i { transform: translateY(-3px) scale(1.1); }
         
-        #weather-banner { background: white; padding: 18px; border-radius: 12px; margin-bottom: 15px; box-shadow: var(--shadow); border: 1px solid #CFD8DC; display:flex; align-items:center; gap:15px; font-weight:700; color: var(--text-main); }
-        .backup-banner { background: #FFF3E0; color: #E65100; padding: 18px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; border: 1px solid #FFE0B2; }
+        #weather-banner { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: var(--shadow); border: 1px solid #E1F5FE; display:flex; align-items:center; gap:12px; font-weight:700; color: var(--text-main); font-size: 15px;}
+        .backup-banner { background: #FFF3E0; color: #E65100; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; border: 1px solid #FFE0B2; }
 
         /* 記帳樣式 */
-        .accounting-form { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow); margin-bottom: 20px; border: 1px solid #CFD8DC; }
-        .form-group { margin-bottom: 15px; }
+        .accounting-form { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow); margin-bottom: 20px; border: 1px solid #E3F2FD; position: relative; overflow: hidden;}
+        /* V10.2.4 新增：記帳表單背景裝飾 */
+        .accounting-form::after { content: '\f1ec'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; right: -10px; bottom: -10px; font-size: 80px; color: rgba(66, 165, 245, 0.07); transform: rotate(-20deg); pointer-events: none;}
+        .form-group { margin-bottom: 15px; position: relative; z-index: 1; }
         .form-label { display: block; font-size: 14px; color: var(--text-sub); margin-bottom: 5px; font-weight: 700; }
         .form-input { width: 100%; padding: 12px; border: 1px solid #CFD8DC; border-radius: 8px; font-size: 16px; outline: none; transition: border 0.2s; background: #FAFAFA; }
         .form-input:focus { border-color: var(--primary); background: #FFF; }
-        .submit-btn { width: 100%; padding: 14px; background: var(--header-gradient); color: white; border: none; border-radius: 50px; font-size: 18px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 10px rgba(84, 110, 122, 0.3); }
+        .submit-btn { width: 100%; padding: 14px; background: var(--header-gradient); color: white; border: none; border-radius: 50px; font-size: 18px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 10px rgba(66, 165, 245, 0.3); position: relative; z-index: 1;}
         .submit-btn:active { transform: scale(0.98); }
 
         .expense-list { list-style: none; padding: 0; margin: 0; }
-        .expense-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #EEE; }
+        .expense-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #F1F8E9; }
         .expense-info { display: flex; flex-direction: column; gap: 4px; }
         .expense-name { font-weight: 700; color: var(--text-main); font-size: 16px; }
         .expense-meta { font-size: 12px; color: var(--text-sub); }
@@ -184,7 +237,7 @@
         </section>
 
         <section id="tab-info" class="view-section">
-            <h3 style="font-size:20px; color:var(--text-main); margin:20px 0 15px; padding-left:12px; font-weight:900; border-left:6px solid #FF7043;">台灣虎航 (高雄 KHH)</h3>
+            <h3 style="font-size:18px; color:var(--text-main); margin:20px 0 15px; padding-left:12px; font-weight:900; border-left:6px solid #FF7043;">台灣虎航 (高雄 KHH)</h3>
             <div class="flight-card">
                 <div class="flight-header"><span><i class="fa-solid fa-plane-departure"></i> 去程 2/4 (週三)</span><span>IT 268</span></div>
                 <div class="flight-body">
@@ -195,7 +248,7 @@
                 <div class="flight-times"><span>14:50</span><span>18:50</span></div>
             </div>
             <div class="flight-card">
-                <div class="flight-header" style="background:#455A64;"><span><i class="fa-solid fa-plane-arrival"></i> 回程 2/11 (週三)</span><span>IT 269</span></div>
+                <div class="flight-header" style="background:#546E7A;"><span><i class="fa-solid fa-plane-arrival"></i> 回程 2/11 (週三)</span><span>IT 269</span></div>
                 <div class="flight-body">
                     <div style="text-align:center;"><div class="airport-code">NGO</div><div class="airport-name">名古屋 T2</div></div>
                     <div style="color:#B0BEC5; font-size:30px;">➔</div>
@@ -203,7 +256,7 @@
                 </div>
                 <div class="flight-times"><span>19:40</span><span>22:35</span></div>
             </div>
-            <h3 style="font-size:20px; color:var(--text-main); margin:30px 0 15px; padding-left:12px; font-weight:900; border-left:6px solid var(--accent);">入住飯店資訊</h3>
+            <h3 style="font-size:18px; color:var(--text-main); margin:30px 0 15px; padding-left:12px; font-weight:900; border-left:6px solid var(--accent);">入住飯店資訊</h3>
             <div class="hotel-card">
                 <div class="hotel-name">Minn STATION Ai Nagoya</div>
                 <span class="hotel-date">2/4 (三) - 2/8 (日) · 4晚</span>
@@ -379,7 +432,7 @@
                 trans: { 
                     mode: "步行前往", 
                     time: "約 7 分", 
-                    route: "沿著高架橋走 (STATION Ai 7F)", // [FIXED] 修正這裡缺少逗號
+                    route: "沿著高架橋走 (STATION Ai 7F)", 
                     fare: "¥0"
                 } 
             },
@@ -394,14 +447,14 @@
         "2026-02-05": [
             { 
                 time: "10:30", title: "出發 (德川園)", sub: "睡飽出門 | 車程約 30 分", type: "move", 
-                map_link: "https://maps.app.goo.gl/2hmRJcyDmzC3AqzQ7https://maps.app.goo.gl/wurExDasHoXdrqjT8",
+                map_link: "https://maps.app.goo.gl/DR5US1Swcfc2goix7",
                 trans: { mode: "JR 中央線", time: "約 4 分", route: "鶴舞站 (鶴舞) <i class='fa-solid fa-arrow-right trans-arrow'></i> 大曾根站 (大曽根) (南口出步行10分)", fare: "¥200" }
             },
-            { time: "11:00", title: "德川園 (Tokugawaen)", sub: "日式庭園", type: "spot", price: "¥300", map_link: "https://maps.app.goo.gl/2hmRJcyDmzC3AqzQ7https://maps.app.goo.gl/wurExDasHoXdrqjT8" },
+            { time: "11:00", title: "德川園 (Tokugawaen)", sub: "日式庭園", type: "spot", price: "¥300", map_link: "https://maps.app.goo.gl/2hmRJcyDmzC3AqzQ7" },
             { time: "12:00", title: "午餐", sub: "園區或附近用餐", type: "food", map_link: "" },
             { 
                 time: "13:30", title: "名古屋城 (本丸御殿)", sub: "參觀宮殿 | ⚠️天守閣整修中", type: "spot", price: "¥500", 
-                map_link: "https://maps.app.goo.gl/NfMn2GaQRvfzhqNo9",
+                map_link: "https://maps.app.goo.gl/wurExDasHoXdrqjT8",
                 trans: { 
                     mode: "市公車 基幹2", time: "約 12 分",
                     route: "Tokugawaen Shindeki (徳川園新出来) <i class='fa-solid fa-arrow-right trans-arrow'></i> Shiyakusho (市役所)", 
@@ -410,7 +463,7 @@
             },
             { 
                 time: "17:00", title: "榮商圈 (Sakae)", sub: "地下街逛街、UNIQLO | 晚餐", type: "shop", 
-                map_link: "https://maps.app.goo.gl/xSSezAJDkzpvzVDP9",
+                map_link: "https://maps.app.goo.gl/NfMn2GaQRvfzhqNo9",
                 trans: { mode: "地鐵名城線", time: "約 3 分", route: "名古屋城站 (名古屋城) <i class='fa-solid fa-arrow-right trans-arrow'></i> 榮站 (栄)", fare: "¥210" }
             }
         ],
@@ -487,7 +540,7 @@
             },
             { 
                 time: "17:00", title: "返回榮商圈", sub: "最後採買 | 整理行李", type: "shop", 
-                map_link: "https://maps.app.goo.gl/WxHYX2tt1ChcnupAA",
+                map_link: "https://maps.app.goo.gl/hQkVqCKfT5QtkLVR9",
                 trans: { mode: "地鐵名城線", time: "約 10 分", route: "熱田神宮西站 (熱田神宮西) <i class='fa-solid fa-arrow-right trans-arrow'></i> 榮站 (栄)", fare: "¥240" }
             }
         ],
@@ -498,7 +551,10 @@
             { 
                 time: "17:30", title: "抵達機場 T2", sub: "虎航櫃檯報到 | 晚餐", type: "move", 
                 map_link: "https://maps.app.goo.gl/wd1DWZFhuDGnfVhE6",
-                trans: { mode: "名鐵特急", time: "約 35 分", route: "榮站 (栄) <i class='fa-solid fa-arrow-right trans-arrow'></i> 金山站 (金山) <i class='fa-solid fa-arrow-right trans-arrow'></i> 中部國際機場 (中部国際空港)", fare: "約 ¥1,150" }
+                trans: {mode: "地鐵名城線 + 名鐵 μ-SKY (全車指定席)", 
+                    time: "約 40 分", 
+                    route: "榮站 (名城線左環 3月台) <i class='fa-solid fa-arrow-right trans-arrow'></i> 金山站 <span style='color:#fff;background:#0288D1;padding:0 5px;border-radius:4px;'>μ-SKY</span> <i class='fa-solid fa-arrow-right trans-arrow'></i> 中部國際機場", 
+                    fare: "¥210 + ¥1,320" }
             },
             { time: "19:40", title: "飛機起飛 (IT 269)", sub: "平安回家", type: "move", map_link: "" }
         ],
@@ -578,7 +634,6 @@
             if(item.price) tagsHtml += `<span class="tag tag-price"><i class="fa-solid fa-ticket"></i> ${item.price}</span>`;
             if(item.sub.includes('⚠️')) tagsHtml += `<span class="tag tag-warn">注意</span>`;
 
-            // [FIXED] 嚴格保留您原本的地圖邏輯，只修正 Fallback 的語法錯誤 (加上 `` 和 ${})
             let href = item.map_link ? item.map_link : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.title + " Nagoya Japan")}`;
             
             let btnStyle = item.map_link === "" ? "display:none" : "";
@@ -601,7 +656,10 @@
             }
 
             const card = document.createElement('div');
+            // V10.2.4 修正：這裡加入 data-type 屬性，讓 CSS 可以根據類型顯示不同背景圖案
             card.className = 'timeline-card';
+            card.setAttribute('data-type', item.type);
+            
             card.innerHTML = `
                 <div class="timeline-line"></div>
                 <div class="card-header"><div class="time">${item.time}</div><div class="title">${item.title}</div></div>
