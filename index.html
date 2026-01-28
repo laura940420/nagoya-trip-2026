@@ -8,49 +8,62 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root {
-            /* V10.2.4 活潑藍色配色 (Lively Dreamy Blue) - 基底維持 V10.2.3 */
-            --bg-color: #E3F2FD;
-            --card-bg: #FFFFFF;
-            --text-main: #37474F; 
-            --text-sub: #78909C;
-            --primary: #42A5F5; 
-            --primary-dark: #1565C0;
-            --header-gradient: linear-gradient(135deg, #64B5F6 0%, #1976D2 100%);
-            --accent: #FF7043;
+             :root {
+            /* iOS 現代色彩計畫 */
+            --bg-color: #F2F2F7;          /* 淺灰背景，護眼 */
+            --card-bg: #FFFFFF;           /* 純白卡片 */
+            --primary: #007AFF;           /* iOS 藍 */
+            --text-main: #1C1C1E;         /* 近乎黑的深灰，比純黑柔和 */
+            --text-sub: #8E8E93;          /* 次要資訊灰 */
+            --divider: #E5E5EA;           /* 分隔線 */
             
-            --tag-food-bg: #FFF3E0; --tag-food-text: #E65100;
+            /* 功能色 */
+            --accent-orange: #FF9500;
+            --accent-green: #34C759;
+            --accent-red: #FF3B30;
+            --accent-purple: #AF52DE;
+ 
+ --tag-food-bg: #FFF3E0; --tag-food-text: #E65100;
             --tag-shop-bg: #E1F5FE; --tag-shop-text: #0277BD;
             --tag-trans-bg: #F3E5F5; --tag-trans-text: #7B1FA2;
             --tag-spot-bg: #E0F2F1; --tag-spot-text: #00695C;
             --tag-price-bg: #F5F5F5; --tag-price-text: #546E7A;
             --tag-warn-bg: #FFEBEE; --tag-warn-text: #C62828;
 
-            --radius: 16px;
-            --shadow: 0 4px 12px rgba(66, 165, 245, 0.15);
+
+            /* 版面設定 */
+            --radius: 20px;               /* 圓潤的卡片導角 */
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.06); /* 極柔和陰影 */
+            --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
-            font-family: 'Noto Sans TC', sans-serif;
+            /* 優先使用系統字體 (San Francisco) */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0; padding: 0;
             height: 100vh;
             display: flex; flex-direction: column;
             overflow: hidden;
-            font-size: 14px;
-                 }
-
-        header { 
-            padding: 20px 20px 15px; 
-            background: var(--header-gradient); 
-            z-index: 10; color: #FFFFFF;
-            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.2);
-            border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
-            position: relative; overflow: hidden;
+            font-size: 16px; /* 提升基礎字級，方便手機閱讀 */
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased; /* 字體平滑 */
+        }
+        
+header { 
+            padding: calc(var(--safe-top) + 20px) 20px 10px;
+            background: rgba(242, 242, 247, 0.9); /* 與背景色相同但半透明 */
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            z-index: 100;
+            position: sticky; top: 0;
+            display: flex; flex-direction: column;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
         }
         /* V10.2.4 新增：Header 右上角的裝飾性飛機 */
         header::after {
@@ -61,8 +74,9 @@
             transform: rotate(-15deg); pointer-events: none;
         }
 
-        .app-title { font-size: 24px; font-weight: 900; color: #FFFFFF; display: flex; align-items: center; gap: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; z-index: 1;}
-        .app-subtitle { font-size: 14px; color: rgba(255,255,255,0.9); margin-left: 38px; margin-top: 5px; font-weight: 700; letter-spacing: 0.5px; position: relative; z-index: 1;}
+        .app-title { font-size: 24px; font-weight: 900; color: #000; display: flex; align-items: center; gap: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; z-index: 1;}
+        .app-subtitle { font-size: 14px; color: var(--text-sub); 
+; margin-left: 38px; margin-top: 5px; font-weight: 700; letter-spacing: 0.5px; position: relative; z-index: 1;}
 
         main { flex: 1; overflow-y: auto; padding-bottom: calc(100px + var(--safe-bottom)); scroll-behavior: smooth; }
         .view-section { display: none; padding: 0 16px; animation: fadeIn 0.4s ease; }
@@ -71,31 +85,34 @@
 
         .date-scroller-wrapper { position: sticky; top: 0; z-index: 20; background: transparent; padding: 15px 0 10px; margin: 0 5px; }
         .date-scroller { display: flex; overflow-x: auto; gap: 10px; scrollbar-width: none; padding: 0 10px; }
-        .date-chip { 
-            flex: 0 0 auto; min-width: 70px; text-align: center; padding: 10px 0; 
-            background: rgba(255,255,255,0.9); border-radius: 12px; 
-            color: var(--text-sub); transition: all 0.3s ease; 
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06); border: 1px solid #E1F5FE;
-            position: relative;
+          .date-chip { 
+            flex: 0 0 auto; 
+            min-width: 64px; 
+            text-align: center; 
+            padding: 10px 14px; 
+            border-radius: 16px; 
+            background: #FFFFFF; 
+            color: var(--text-sub); 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: all 0.2s; 
+            border: 1px solid rgba(0,0,0,0.02);
+            display: flex; flex-direction: column; justify-content: center;
         }
+        
         .date-chip.active { 
-            background: var(--primary); color: white; 
-            transform: translateY(-4px); 
-            box-shadow: 0 6px 12px rgba(66, 165, 245, 0.4); 
-            border-color: transparent; 
-        }
-        /* V10.2.4 新增：選中日期上面的小裝飾 */
-        .date-chip.active::before {
-            content: '\f005'; /* Star */
-            font-family: "Font Awesome 6 Free"; font-weight: 900;
-            position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
-            font-size: 12px; color: #FFD54F; text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            background: var(--primary); 
+            color: #FFF; 
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3); /* 藍色光暈 */
+            transform: scale(1.02);
+            border: none;
         }
 
-        .date-chip.backup { border: 2px solid var(--accent); color: var(--accent); background: #FFF; }
-        .date-chip.backup.active { background: var(--accent); color: white; border-color: var(--accent); }
-        .date-chip .day { font-size: 13px; margin-bottom: 4px; font-weight: 700; }
-        .date-chip .date { font-size: 18px; font-weight: 900; font-family: 'Roboto'; }
+        .date-chip.backup { border: 1px solid var(--accent-orange); color: var(--accent-orange); }
+        .date-chip.backup.active { background: var(--accent-orange); color: white; border: none; box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);}
+        
+        .date-chip .day { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
+        .date-chip .date { font-size: 18px; font-weight: 700; font-family: -apple-system; letter-spacing: -0.5px; }
+
 
         .timeline-container { position: relative; padding-left: 10px; margin-top: 15px; }
         .timeline-card { 
@@ -116,10 +133,11 @@
         /* 預設圖示 */
         .timeline-card::after { content: '\f3c5'; color: var(--primary); } /* map-marker */
         /* 不同類型的專屬圖示與顏色 */
-        .timeline-card[data-type="food"]::after { content: '\f2e7'; color: var(--tag-food-text); opacity: 0.08; } /* utensils */
+     .timeline-card[data-type="food"]::after { content: '\f2e7'; color: var(--tag-food-text); opacity: 0.08; } /* utensils */
         .timeline-card[data-type="spot"]::after { content: '\f030'; color: var(--tag-spot-text); opacity: 0.08; } /* camera */
         .timeline-card[data-type="shop"]::after { content: '\f291'; color: var(--tag-shop-text); opacity: 0.08; } /* shopping-basket */
         .timeline-card[data-type="move"]::after { content: '\f0ec'; color: var(--tag-trans-text); opacity: 0.07; } /* exchange */
+
 
 
         .timeline-line { 
@@ -149,7 +167,7 @@
         .trans-fare { font-weight: 700; color: #D84315; margin-left: 8px; font-family: 'Roboto'; font-size: 14px; background: #FFCCBC; padding: 2px 6px; border-radius: 4px;}
         .trans-arrow { color: #90CAF9; margin: 0 5px; font-size: 14px; }
         
-        .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+      .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
         .tag { display: inline-flex; align-items: center; padding: 5px 10px; border-radius: 8px; font-size: 13px; font-weight: 700; }
         .tag-food { background: var(--tag-food-bg); color: var(--tag-food-text); }
         .tag-shop { background: var(--tag-shop-bg); color: var(--tag-shop-text); }
@@ -157,7 +175,6 @@
         .tag-spot { background: var(--tag-spot-bg); color: var(--tag-spot-text); }
         .tag-price { background: var(--tag-price-bg); color: var(--tag-price-text); border: 1px solid #CFD8DC; }
         .tag-warn { background: var(--tag-warn-bg); color: var(--tag-warn-text); font-weight: 900; border: 2px solid #FFCDD2; }
-
         .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
         .nav-btn { display: flex; align-items: center; justify-content: center; gap: 10px; background: white; color: var(--primary); padding: 12px 20px; border-radius: 50px; text-decoration: none; font-size: 16px; font-weight: 700; border: 2px solid #BBDEFB; width: 100%; transition: all 0.2s; }
         .nav-btn:active { background: #E3F2FD; transform: scale(0.98); }
@@ -200,24 +217,75 @@
         .backup-banner { background: #FFF3E0; color: #E65100; padding: 15px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; border: 1px solid #FFE0B2; }
 
         /* 記帳樣式 */
-        .accounting-form { background: white; padding: 20px; border-radius: 16px; box-shadow: var(--shadow); margin-bottom: 20px; border: 1px solid #E3F2FD; position: relative; overflow: hidden;}
-        /* V10.2.4 新增：記帳表單背景裝飾 */
-        .accounting-form::after { content: '\f1ec'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; right: -10px; bottom: -10px; font-size: 80px; color: rgba(66, 165, 245, 0.07); transform: rotate(-20deg); pointer-events: none;}
-        .form-group { margin-bottom: 15px; position: relative; z-index: 1; }
-        .form-label { display: block; font-size: 14px; color: var(--text-sub); margin-bottom: 5px; font-weight: 700; }
-        .form-input { width: 100%; padding: 12px; border: 1px solid #CFD8DC; border-radius: 8px; font-size: 16px; outline: none; transition: border 0.2s; background: #FAFAFA; }
+       .accounting-form {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        .form-group { margin-bottom: 16px; }
+        .form-label { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; display: block;}
+        .form-input { 
+            width: 100%; 
+            padding: 14px; 
+            border: 1px solid #E5E5EA; 
+            border-radius: 12px; 
+            font-size: 17px; 
+            background: #F9F9FB;
+            color: var(--text-main);
+            outline: none;
+            -webkit-appearance: none; /* 移除 iOS 預設陰影 */
+        }
         .form-input:focus { border-color: var(--primary); background: #FFF; }
-        .submit-btn { width: 100%; padding: 14px; background: var(--header-gradient); color: white; border: none; border-radius: 50px; font-size: 18px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 10px rgba(66, 165, 245, 0.3); position: relative; z-index: 1;}
-        .submit-btn:active { transform: scale(0.98); }
+        .submit-btn { 
+            width: 100%; padding: 16px; 
+            background: var(--primary); color: white; 
+            border: none; border-radius: 14px; 
+            font-size: 17px; font-weight: 600; 
+            cursor: pointer;
+        }
 
-        .expense-list { list-style: none; padding: 0; margin: 0; }
-        .expense-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #F1F8E9; }
+         .expense-list { list-style: none; padding: 0; margin: 0; background: var(--card-bg); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);}
+        .expense-item { 
+            padding: 16px 20px; 
+            border-bottom: 1px solid var(--divider); 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
         .expense-info { display: flex; flex-direction: column; gap: 4px; }
         .expense-name { font-weight: 700; color: var(--text-main); font-size: 16px; }
         .expense-meta { font-size: 12px; color: var(--text-sub); }
         .expense-amount { font-family: 'Roboto'; font-weight: 900; color: var(--accent); font-size: 18px; }
-        .total-banner { background: var(--primary); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: 900; font-size: 20px; box-shadow: var(--shadow); }
-        .delete-btn { color: #CFD8DC; margin-left: 15px; padding: 5px; cursor: pointer; font-size: 18px;}
+               .delete-btn { color: #CFD8DC; margin-left: 15px; padding: 5px; cursor: pointer; font-size: 18px;}
+
+        /* Banner */
+        #weather-banner { 
+            background: #FFF; 
+            padding: 16px; 
+            border-radius: 16px; 
+            margin-bottom: 20px; 
+            box-shadow: var(--shadow);
+            display:flex; align-items:center; gap:12px; 
+            font-weight:600; color: var(--text-main); font-size: 15px;
+        }
+        .backup-banner { 
+            background: #FFF3E0; color: #E65100; 
+            padding: 16px; border-radius: 16px; 
+            margin-bottom: 20px; display: flex; gap: 12px; align-items: center;
+        }
+
+        h3 { 
+            font-size: 20px; font-weight: 700; color: var(--text-main); 
+            margin: 30px 0 15px 5px; letter-spacing: -0.5px;
+        }
+        .total-banner { 
+            text-align: center; margin-bottom: 20px; 
+            font-size: 15px; color: var(--text-sub); 
+        }
+        #total-amount { 
+            display: block; font-size: 40px; font-weight: 800; 
+            color: var(--text-main); margin-top: 5px; font-family: -apple-system;
+        }
 
     </style>
 </head>
@@ -273,7 +341,7 @@
 
         <section id="tab-accounting" class="view-section">
             <div class="total-banner">
-                總支出：¥<span id="total-amount">0</span>
+                總支出：<span id="total-amount">0</span>
             </div>
         
             <div class="accounting-form">
@@ -401,7 +469,7 @@
             } else {
                 list.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">目前還沒有花費紀錄</div>';
             }
-            totalEl.innerText = total.toLocaleString();
+           totalEl.innerText = "¥" + total.toLocaleString();
         }, (error) => {
             console.log("Read error", error);
         });
@@ -720,4 +788,3 @@
 </script>
 </body>
 </html>
-
